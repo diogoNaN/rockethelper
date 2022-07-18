@@ -1,8 +1,24 @@
 import React from "react";
-import { NativeBaseProvider } from "native-base";
+import { NativeBaseProvider, StatusBar } from "native-base";
+import { useFonts } from "expo-font";
+import { Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto";
 
 import { THEME } from "./src/styles/theme";
 
+import Signin from "./src/screens/Signin";
+import Loading from "./src/components/Loading";
+
 export default function App() {
-  return <NativeBaseProvider theme={THEME}></NativeBaseProvider>;
+  const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold });
+
+  return (
+    <NativeBaseProvider theme={THEME}>
+      <StatusBar
+        translucent
+        barStyle="light-content"
+        backgroundColor="transparent"
+      />
+      {fontsLoaded ? <Signin /> : <Loading />}
+    </NativeBaseProvider>
+  );
 }
