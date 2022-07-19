@@ -5,10 +5,12 @@ import {
   Text,
 } from "native-base";
 
-interface IFilterProps extends IButtonProps {
+import Status from "../@types/status";
+
+interface FilterProps extends IButtonProps {
   title: string;
   isActive?: boolean;
-  type: "open" | "close";
+  type: Status;
 }
 
 export default function Filter({
@@ -16,7 +18,7 @@ export default function Filter({
   isActive = false,
   type,
   ...rest
-}: IFilterProps) {
+}: FilterProps) {
   const { colors } = useTheme();
 
   const colorType = type === "open" ? colors.secondary[700] : colors.green[300];
@@ -38,4 +40,4 @@ export default function Filter({
   );
 }
 
-export type { IFilterProps };
+export type { FilterProps };

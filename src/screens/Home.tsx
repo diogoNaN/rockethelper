@@ -1,24 +1,29 @@
+import { useState } from "react";
 import {
   Heading,
-  Icon,
   IconButton,
   Text,
   useTheme,
   VStack,
   HStack,
+  FlatList,
 } from "native-base";
 import { SignOut } from "phosphor-react-native";
-import { useState } from "react";
 
 import Logo from "../assets/logo_secondary.svg";
 
-import Filter, { IFilterProps } from "../components/Filter";
+import Filter from "../components/Filter";
+import Button from "../components/Button";
+import EmptyOrders from "../components/EmptyOrders";
+import Order, { OrderProps } from "../components/Order";
+
+import Status from "../@types/status";
 
 export default function Home() {
   const { colors } = useTheme();
 
-  const [statusSelected, setStatusSelected] =
-    useState<IFilterProps["type"]>("open");
+  const [statusSelected, setStatusSelected] = useState<Status>("open");
+  const [orders, setOrders] = useState<OrderProps[]>([]);
 
   return (
     <VStack flex={1} pb={6} bg="gray.700">
@@ -59,10 +64,23 @@ export default function Home() {
           <Filter
             title="finalizados"
             type="close"
-            isActive={statusSelected === "close"}
-            onPress={() => setStatusSelected("close")}
+            isActive={statusSelected === "closed"}
+            onPress={() => setStatusSelected("closed")}
           />
         </HStack>
+
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <Order data={item} onPress={() => {}} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          ListEmptyComponent={() => (
+            <EmptyOrders statusSelected={statusSelected} />
+          )}
+        />
+
+        <Button title="Nova solicitação" />
       </VStack>
     </VStack>
   );
