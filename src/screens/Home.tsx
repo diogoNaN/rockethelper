@@ -9,6 +9,7 @@ import {
   FlatList,
 } from "native-base";
 import { SignOut } from "phosphor-react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import Logo from "../assets/logo_secondary.svg";
 
@@ -21,9 +22,18 @@ import Status from "../@types/status";
 
 export default function Home() {
   const { colors } = useTheme();
+  const { navigate } = useNavigation();
 
   const [statusSelected, setStatusSelected] = useState<Status>("open");
   const [orders, setOrders] = useState<OrderProps[]>([]);
+
+  function handleCreateOrder() {
+    navigate("Create");
+  }
+
+  function handleOpenDetails(orderId: string) {
+    navigate("Details", { orderId });
+  }
 
   return (
     <VStack flex={1} pb={6} bg="gray.700">
@@ -51,7 +61,7 @@ export default function Home() {
         >
           <Heading color={"gray.100"}>Meus chamados</Heading>
 
-          <Text color={"gray.200"}>3</Text>
+          <Text color={"gray.200"}>{orders.length}</Text>
         </HStack>
 
         <HStack space={3} mb={8}>
@@ -63,7 +73,7 @@ export default function Home() {
           />
           <Filter
             title="finalizados"
-            type="close"
+            type="closed"
             isActive={statusSelected === "closed"}
             onPress={() => setStatusSelected("closed")}
           />
@@ -72,7 +82,9 @@ export default function Home() {
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Order data={item} onPress={() => {}} />}
+          renderItem={({ item }) => (
+            <Order data={item} onPress={() => handleOpenDetails(item.id)} />
+          )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
           ListEmptyComponent={() => (
@@ -80,7 +92,7 @@ export default function Home() {
           )}
         />
 
-        <Button title="Nova solicitação" />
+        <Button title="Nova solicitação" onPress={handleCreateOrder} />
       </VStack>
     </VStack>
   );
