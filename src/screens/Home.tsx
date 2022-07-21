@@ -10,6 +10,7 @@ import {
 } from "native-base";
 import { SignOut } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
+import auth from "@react-native-firebase/auth";
 
 import Logo from "../assets/logo_secondary.svg";
 
@@ -19,6 +20,7 @@ import EmptyOrders from "../components/EmptyOrders";
 import Order, { OrderProps } from "../components/Order";
 
 import Status from "../@types/status";
+import { Alert } from "react-native";
 
 export default function Home() {
   const { colors } = useTheme();
@@ -26,6 +28,14 @@ export default function Home() {
 
   const [statusSelected, setStatusSelected] = useState<Status>("open");
   const [orders, setOrders] = useState<OrderProps[]>([]);
+
+  function handleLogout() {
+    auth()
+      .signOut()
+      .catch((err) => {
+        return Alert.alert("Ops", "Falha ao sair");
+      });
+  }
 
   function handleCreateOrder() {
     navigate("Create");
@@ -48,7 +58,10 @@ export default function Home() {
       >
         <Logo />
 
-        <IconButton icon={<SignOut size={26} color={colors.gray[300]} />} />
+        <IconButton
+          icon={<SignOut size={26} color={colors.gray[300]} />}
+          onPress={handleLogout}
+        />
       </HStack>
 
       <VStack flex={1} px={6}>
