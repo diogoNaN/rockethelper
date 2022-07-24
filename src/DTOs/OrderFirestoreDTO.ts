@@ -1,12 +1,10 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
-import Status from "../@types/status";
+import { BaseOrder } from "../@types/order";
 
-export type OrderFirestoreDTO = {
-  patrimony: string;
-  description: string;
-  status: Status;
-  solution?: string;
+interface OrderFirestoreDTO extends BaseOrder {
   created_at: FirebaseFirestoreTypes.Timestamp;
   closed_at?: FirebaseFirestoreTypes.Timestamp;
-};
+}
+
+export default OrderFirestoreDTO;
