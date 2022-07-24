@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Alert } from "react-native";
+import { useEffect, useState } from "react";
 import {
   Heading,
   IconButton,
@@ -11,21 +12,25 @@ import {
 import { SignOut } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
 import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
 import Logo from "../assets/logo_secondary.svg";
 
 import Filter from "../components/Filter";
 import Button from "../components/Button";
+import Loading from "../components/Loading";
 import EmptyOrders from "../components/EmptyOrders";
 import Order, { OrderProps } from "../components/Order";
 
+import firestoreDateFormat from "../utils/firestoreDateFormat";
+
 import Status from "../@types/status";
-import { Alert } from "react-native";
 
 export default function Home() {
   const { colors } = useTheme();
   const { navigate } = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [statusSelected, setStatusSelected] = useState<Status>("open");
   const [orders, setOrders] = useState<OrderProps[]>([]);
 
@@ -44,6 +49,33 @@ export default function Home() {
   function handleOpenDetails(orderId: string) {
     navigate("Details", { orderId });
   }
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    const unsubscribe = firestore()
+      .collection("orders")
+      .where("status", "==", statusSelected)
+      .onSnapshot((snapshot) => {
+        const data = snapshot.docs.map((doc) => {
+          const { id } = doc;
+          const { patrimony, description, status, created_at } = doc.data();
+
+          return {
+            id,
+            patrimony,
+            description,
+            status,
+            when: firestoreDateFormat(created_at),
+          };
+        });
+
+        setOrders(data);
+        setIsLoading(false);
+      });
+
+    return unsubscribe;
+  }, [statusSelected]);
 
   return (
     <VStack flex={1} pb={6} bg="gray.700">
@@ -92,18 +124,22 @@ export default function Home() {
           />
         </HStack>
 
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Order data={item} onPress={() => handleOpenDetails(item.id)} />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          ListEmptyComponent={() => (
-            <EmptyOrders statusSelected={statusSelected} />
-          )}
-        />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <FlatList
+            data={orders}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Order data={item} onPress={() => handleOpenDetails(item.id)} />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            ListEmptyComponent={() => (
+              <EmptyOrders statusSelected={statusSelected} />
+            )}
+          />
+        )}
 
         <Button title="Nova solicitação" onPress={handleCreateOrder} />
       </VStack>
