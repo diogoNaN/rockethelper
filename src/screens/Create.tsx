@@ -13,14 +13,14 @@ export default function Create() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [patrimony, setPatrimony] = useState("");
-  const [descripton, setDescription] = useState("");
+  const [description, setDescription] = useState("");
 
   function handleCreate() {
     if (!patrimony) {
       return Alert.alert("Ops", "Adicione o patrimonio");
     }
 
-    if (!descripton) {
+    if (!description) {
       return Alert.alert("Ops", "Adicione a descrição");
     }
 
@@ -30,7 +30,7 @@ export default function Create() {
       .collection("orders")
       .add({
         patrimony,
-        descripton,
+        description,
         status: "open",
         created_at: firestore.FieldValue.serverTimestamp(),
       })
@@ -60,7 +60,7 @@ export default function Create() {
         mt={5}
         multiline
         textAlignVertical="top"
-        value={descripton}
+        value={description}
         onChangeText={setDescription}
       />
 
